@@ -26,7 +26,7 @@ export async function testGeminiConnection() {
     throw err
   }
 
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash"
+  const model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite"
 
   try {
     const ai = getGeminiClient()
@@ -147,33 +147,37 @@ export async function reviewBaselineWithGemini(eventData, baselineResult) {
     return null
   }
 
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash"
+  const model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite"
   const ai = getGeminiClient()
   if (!ai) return null
 
   const prompt = `You are CaterAI, an AI catering quantity assistant.
 Review the provided deterministic catering estimates.
-Use the event context, guest distribution, dietary mix, meal timing, duration, season and menu composition.
-Make an adjustment ONLY when the context supports it.
-
+Return structured JSON only:
+{
+  "estimates": [
+    {
+      "dish": "Dish Name",
+      "recommendedQuantity": 15.0,
+      "unit": "kg",
+      "estimatedConsumers": 350,
+      "confidence": 0.88,
+      "reason": "Justification"
+    }
+  ],
+  "summary": "Plan summary"
+}
 Rules:
-1. Never invent dishes.
-2. Never remove selected dishes.
-3. Return every selected dish.
-4. Never produce negative quantities.
-5. Keep quantities within approximately ±20% of the baseline.
-6. Preserve the original unit.
-7. Confidence must be between 0 and 1.
-8. Provide a concise reason for every recommendation.
-9. Return structured JSON only.
+1. Return every one of the selected dishes with exact original dish name and unit.
+2. Keep recommendedQuantity within +/- 20% of baseline.
+3. Quantities must be positive numbers.
+4. Confidence between 0 and 1.
+5. Provide a concise reason for each dish.
 
 EVENT CONTEXT:
 Guests: ${eventData.guests} (Adults: ${eventData.adults}, Children: ${eventData.children})
 Dietary: ${eventData.vegetarianPercentage}% Vegetarian, ${eventData.nonVegetarianPercentage}% Non-Vegetarian
-Event Type: ${eventData.eventType}
-Meal: ${eventData.meal}
-Duration: ${eventData.duration} hours
-Season: ${eventData.season}
+Event: ${eventData.eventType}, Meal: ${eventData.meal}, Duration: ${eventData.duration} hrs, Season: ${eventData.season}
 
 BASELINE ESTIMATES:
 ${JSON.stringify(
@@ -187,27 +191,12 @@ ${JSON.stringify(
     })),
     null,
     2
-  )}
-
-Expected JSON Output format:
-{
-  "estimates": [
-    {
-      "dish": "Dish Name",
-      "recommendedQuantity": 15.0,
-      "unit": "kg",
-      "estimatedConsumers": 350,
-      "confidence": 0.88,
-      "reason": "Concise justification"
-    }
-  ],
-  "summary": "Overall catering plan summary"
-}`
+  )}`
 
   try {
-    // 7-second timeout for AI review to guarantee fast responses
+    // 15-second timeout for AI review to guarantee completion
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Gemini request timed out")), 7000)
+      setTimeout(() => reject(new Error("Gemini request timed out")), 15000)
     )
 
     const aiPromise = ai.models.generateContent({
