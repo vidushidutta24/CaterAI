@@ -232,10 +232,10 @@ export default function ResultsDashboard({ onNavigate }) {
           </div>
           <div className="space-y-2 max-w-md mx-auto">
             <h2 className="text-xl font-bold text-foreground">
-              Unable to generate your catering plan
+              Unable to generate your catering plan.
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              {apiError}
+              We couldn't reach the estimation service. You can retry or use the demo plan.
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -324,19 +324,19 @@ export default function ResultsDashboard({ onNavigate }) {
           {planResult?.source === "ai" && (
             <Badge className="bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30 text-xs font-semibold">
               <Sparkles className="mr-1 h-3 w-3" />
-              AI enriched
+              AI Estimate
             </Badge>
           )}
           {planResult?.source === "fallback" && (
             <Badge className="bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30 text-xs font-semibold">
               <ShieldCheck className="mr-1 h-3 w-3" />
-              Deterministic estimate
+              Model Estimate
             </Badge>
           )}
           {planResult?.source === "demo" && (
             <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 text-xs font-semibold">
               <Info className="mr-1 h-3 w-3" />
-              Demo data
+              Demo Data
             </Badge>
           )}
         </div>

@@ -13,48 +13,48 @@ import { Card, CardContent } from "@/components/ui/card"
 export default function ImpactPanel({
   estimatedTotalCost = "Not provided",
   costFootnote = "Not calculated by backend",
-  estimatedSurplusReduction = "15–20% surplus prevented",
-  surplusFootnote = "Backend verified estimate",
+  estimatedSurplusReduction = "Model estimate based on comparison with a flat per-head buffer.",
+  surplusFootnote = "Model estimate",
   estimatedCO2Impact = "Not provided",
   co2Footnote = "Not calculated by backend",
   isBackendSource = true,
 }) {
-  const isCostProvided = estimatedTotalCost !== "Not provided"
-  const isCo2Provided = estimatedCO2Impact !== "Not provided"
+  const isCostProvided = estimatedTotalCost && estimatedTotalCost !== "Not provided"
+  const isCo2Provided = estimatedCO2Impact && estimatedCO2Impact !== "Not provided"
 
-  const metrics = [
+  const allMetrics = [
     {
-      title: "Potential Surplus Reduction",
+      title: "Estimated Surplus Avoided",
       value: estimatedSurplusReduction,
-      subtext: surplusFootnote,
+      subtext: "Model estimate",
       icon: TrendingDown,
       accent: "text-emerald-600 bg-emerald-500/10 border-emerald-500/20",
       valueColor: "text-emerald-700 dark:text-emerald-400 font-bold",
     },
-    {
-      title: "Estimated Catering Cost",
-      value: estimatedTotalCost,
-      subtext: costFootnote,
-      icon: IndianRupee,
-      accent: isCostProvided
-        ? "text-primary bg-primary/10 border-primary/20"
-        : "text-muted-foreground bg-muted/40 border-border",
-      valueColor: isCostProvided
-        ? "text-foreground font-bold"
-        : "text-muted-foreground text-base font-medium",
-    },
-    {
-      title: "Estimated CO₂ Impact",
-      value: estimatedCO2Impact,
-      subtext: co2Footnote,
-      icon: Leaf,
-      accent: isCo2Provided
-        ? "text-teal-600 bg-teal-500/10 border-teal-500/20"
-        : "text-muted-foreground bg-muted/40 border-border",
-      valueColor: isCo2Provided
-        ? "text-teal-700 dark:text-teal-400 font-bold"
-        : "text-muted-foreground text-base font-medium",
-    },
+    ...(isCostProvided
+      ? [
+          {
+            title: "Estimated Catering Cost",
+            value: estimatedTotalCost,
+            subtext: costFootnote,
+            icon: IndianRupee,
+            accent: "text-primary bg-primary/10 border-primary/20",
+            valueColor: "text-foreground font-bold",
+          },
+        ]
+      : []),
+    ...(isCo2Provided
+      ? [
+          {
+            title: "Estimated CO₂ Impact",
+            value: estimatedCO2Impact,
+            subtext: co2Footnote,
+            icon: Leaf,
+            accent: "text-teal-600 bg-teal-500/10 border-teal-500/20",
+            valueColor: "text-teal-700 dark:text-teal-400 font-bold",
+          },
+        ]
+      : []),
   ]
 
   return (
@@ -80,7 +80,7 @@ export default function ImpactPanel({
         </div>
 
         <div className="grid grid-cols-1 gap-3">
-          {metrics.map((metric, index) => {
+          {allMetrics.map((metric, index) => {
             const Icon = metric.icon
             return (
               <motion.div

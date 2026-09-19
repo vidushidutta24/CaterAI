@@ -13,7 +13,7 @@ const API_BASE_URL =
   (typeof import.meta !== "undefined" &&
     import.meta.env &&
     import.meta.env.VITE_API_BASE_URL) ||
-  ""
+  "http://localhost:5000"
 
 /**
  * Clean mapping between frontend dish identifiers (kebab-case)
@@ -174,10 +174,10 @@ export function normalizeEstimateResponse(backendResponse, eventData, selectedMe
     source, // "ai" | "fallback" | "demo"
     sourceLabel:
       source === "ai"
-        ? "AI enriched"
+        ? "AI Estimate"
         : source === "fallback"
-          ? "Deterministic estimate"
-          : "Demo data",
+          ? "Model Estimate"
+          : "Demo Data",
     eventSummary: data.eventSummary || {
       guests: totalGuests,
       eventType: eventData?.eventType || "wedding",
@@ -205,11 +205,6 @@ export function normalizeEstimateResponse(backendResponse, eventData, selectedMe
  * Calls POST /api/estimate with timeout handling and error extraction.
  */
 export async function estimateCateringPlan(eventData, selectedMenu = []) {
-  // If API base URL is not configured (standalone frontend), use reliable local demo estimates
-  if (!API_BASE_URL) {
-    return getDemoCateringPlan(eventData, selectedMenu)
-  }
-
   const payload = buildBackendPayload(eventData, selectedMenu)
 
   const controller = new AbortController()
